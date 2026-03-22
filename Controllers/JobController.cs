@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
+using JobTrackerApp.Models;
 namespace JobTrackerApp.Controllers
 {
     [ApiController]
@@ -19,8 +19,16 @@ namespace JobTrackerApp.Controllers
         [HttpGet("{id}")]
         public IActionResult GetJobById(int id)
         {
-            return Ok($"Job with ID:{id}");
+            var job = new Job
+            {
+                Id = id,
+                Company = "Sample Company",
+                Role = "Sample Role",
+                Status = "Applied"
+            };
+            return Ok(job);
         }
-
     }
-}
+
+ }
+
