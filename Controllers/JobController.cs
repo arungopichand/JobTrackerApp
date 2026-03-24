@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using JobTrackerApp.Models;
+using System.Reflection.Metadata.Ecma335;
 namespace JobTrackerApp.Controllers
 {
     [ApiController]
@@ -38,14 +39,30 @@ namespace JobTrackerApp.Controllers
             {
                 return BadRequest("Company is required");
             }
-            else
-            {
+            
                 job.Id = jobs.Count + 1;
                 jobs.Add(job);
 
                 return Ok(job);
-            }
+            
         }
+
+        [HttpPut]
+        public IActionResult UpdateJob(int id, Job updatedJob)
+        {
+            var job = jobs.FirstOrDefault(j => j.Id==id); ;
+
+            if (job == null)
+            {
+                return NotFound("Job not found");
+            }
+            job.Company = updatedJob.Company;
+            job.Role = updatedJob.Role;
+            job.Status = updatedJob.Status;
+
+            return Ok(job);
+        }
+        
     }
 
  }
