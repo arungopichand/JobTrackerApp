@@ -56,12 +56,31 @@ namespace JobTrackerApp.Controllers
             {
                 return NotFound("Job not found");
             }
+            if (string.IsNullOrEmpty(updatedJob.Company))
+            {
+                return BadRequest("Company is required");
+            }
             job.Company = updatedJob.Company;
             job.Role = updatedJob.Role;
             job.Status = updatedJob.Status;
 
             return Ok(job);
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteJob(int id)
+        {
+            var job = jobs.FirstOrDefault(j => j.Id == id);
+            if (job == null)
+            {
+                return NotFound("Job not found");
+            }
+
+            jobs.Remove(job);
+
+            return Ok("Job deleted successfully");
+        }
+
         
     }
 
