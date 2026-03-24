@@ -6,15 +6,17 @@ namespace JobTrackerApp.Controllers
     [Route("api/[controller]")]
     public class JobController : Controller
     {
+        private static List<Job> jobs = new List<Job>
+    {
+        new Job{ Id =1, Company = "Deloitee", Role = ".NET Developer", Status = "Applied" },
+        new Job { Id=2, Company="EY", Role ="Power Platform Engineer", Status = "Interview"}
+
+    };
         [HttpGet]
         public IActionResult GetAllJobs()
         {
-            var jobs = new List<string>
-            {
-                "Deloitee - .Net Developer",
-                "EY - Power Platform Engineer"
-            };
-            return Ok(jobs);
+            
+           return Ok(jobs);
         }
         [HttpGet("{id}")]
         public IActionResult GetJobById(int id)
@@ -27,6 +29,22 @@ namespace JobTrackerApp.Controllers
                 Status = "Applied"
             };
             return Ok(job);
+        }
+
+        [HttpPost]
+        public IActionResult CreateJob(Job job)
+        {
+            if (string.IsNullOrEmpty(job.Company))
+            {
+                return BadRequest("Company is required");
+            }
+            else
+            {
+                job.Id = jobs.Count + 1;
+                jobs.Add(job);
+
+                return Ok(job);
+            }
         }
     }
 
