@@ -22,13 +22,14 @@ namespace JobTrackerApp.Controllers
         [HttpGet("{id}")]
         public IActionResult GetJobById(int id)
         {
-            var job = new Job
+            var job = jobs.FirstOrDefault(j => j.Id == id);
+
+            if ((job == null))
             {
-                Id = id,
-                Company = "Sample Company",
-                Role = "Sample Role",
-                Status = "Applied"
-            };
+                return NotFound("Job not found");
+            }
+
+
             return Ok(job);
         }
 
@@ -43,11 +44,11 @@ namespace JobTrackerApp.Controllers
                 job.Id = jobs.Count + 1;
                 jobs.Add(job);
 
-                return Ok(job);
+                return CreatedAtAction(nameof(GetJobById), new { id = job.Id}, job);
             
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public IActionResult UpdateJob(int id, Job updatedJob)
         {
             var job = jobs.FirstOrDefault(j => j.Id==id); ;
@@ -78,10 +79,9 @@ namespace JobTrackerApp.Controllers
 
             jobs.Remove(job);
 
-            return Ok("Job deleted successfully");
+            return NoContent();
         }
-
-        
+   
     }
 
  }
