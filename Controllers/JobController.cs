@@ -1,83 +1,60 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using JobTrackerApp.Models;
 using System.Reflection.Metadata.Ecma335;
+using JobTrackerApp.Services;
 namespace JobTrackerApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class JobController : Controller
+    public class JobController : ControllerBase
     {
-        private static List<Job> jobs = new List<Job>
-    {
-        new Job{ Id =1, Company = "Deloitee", Role = ".NET Developer", Status = "Applied" },
-        new Job { Id=2, Company="EY", Role ="Power Platform Engineer", Status = "Interview"}
+        private readonly IJobService _jobService;
+        public JobController(IJobService jobService)
+        {
+            _jobService = jobService;
+        }
 
-    };
         [HttpGet]
         public IActionResult GetAllJobs()
         {
-            
-           return Ok(jobs);
+            return Ok(_jobService.GetAllJobs());
         }
         [HttpGet("{id}")]
         public IActionResult GetJobById(int id)
         {
-            var job = jobs.FirstOrDefault(j => j.Id == id);
-
-            if ((job == null))
-            {
+            var job = _jobService.GetJobById(id);
+            if (job == null)
                 return NotFound("Job not found");
-            }
-
-
+           
             return Ok(job);
         }
 
         [HttpPost]
         public IActionResult CreateJob(Job job)
         {
-            if (string.IsNullOrEmpty(job.Company))
-            {
-                return BadRequest("Company is required");
-            }
-            
-                job.Id = jobs.Count + 1;
-                jobs.Add(job);
-
-                return CreatedAtAction(nameof(GetJobById), new { id = job.Id}, job);
-            
+            var createdJob = _jobService.CreateJob(job);
+            return CreatedAtAction(nameof(GetJobById), new { id = createdJob.Id }, createdJob);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateJob(int id, Job updatedJob)
+        public IActionResult UpdateJob(int id, Job job)
         {
-            var job = jobs.FirstOrDefault(j => j.Id==id); ;
+            var updated = _jobService.UpdateJob(id, job);
 
-            if (job == null)
-            {
+            if (updated == null)
                 return NotFound("Job not found");
-            }
-            if (string.IsNullOrEmpty(updatedJob.Company))
-            {
-                return BadRequest("Company is required");
-            }
-            job.Company = updatedJob.Company;
-            job.Role = updatedJob.Role;
-            job.Status = updatedJob.Status;
 
-            return Ok(job);
+            return Ok(updated);
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteJob(int id)
         {
-            var job = jobs.FirstOrDefault(j => j.Id == id);
-            if (job == null)
-            {
-                return NotFound("Job not found");
-            }
 
-            jobs.Remove(job);
+            var deleted = _jobService.DeleteJob(id);
+
+            if (!deleted)
+                return NotFound("Job not found");
 
             return NoContent();
         }
